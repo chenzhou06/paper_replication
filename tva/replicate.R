@@ -97,4 +97,11 @@ nrow(db6) # 2974 rows
 
 
 ## merge extra manuf. variables
-
+manuf <- read_dta("./original/data/data2.dta")
+tva <- read_dta("./original/data/tva.dta")
+tva3 <- read_dta("./original/data/tva3.dta")
+db7 <- db6 %>%
+    left_join(manuf, by = "fips") %>%
+    left_join(tva, by = "fips") %>%
+    left_join(tva3, by = "fips")
+nrow(db7)
