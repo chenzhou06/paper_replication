@@ -105,3 +105,28 @@ db7 <- db6 %>%
     left_join(tva, by = "fips") %>%
     left_join(tva3, by = "fips")
 nrow(db7)
+
+row_max <- function(...) {
+    m <- data.frame(...)
+    apply(m, 1, max)
+}
+## proposed authorities
+auth <- read_dta("./original/data/autorities/data.dta")
+db8 <- db7 %>% left_join(auth, by = "fips") %>%
+    mutate(aut4 = ifelse(row_max(aut_euclidean1, aut_euclidean2, aut_euclidean3, aut_centr4, aut_euclidean5, aut_euclidean6) == 1,
+                        1, 0))
+nrow(db8)
+with(db8, {
+    print(table(aut_euclidean1))
+    print(table(aut_euclidean2))
+    print(table(aut_euclidean3))
+    print(table(aut_centr4))
+    print(table(aut_euclidean5))
+    print(table(aut_euclidean6))
+    print(table(aut4))
+    print(table(tva))
+})
+
+db8 %>%
+    select(-starts_with("aut_eucl"),
+           -starts_with("aut_cent")) -> db9
