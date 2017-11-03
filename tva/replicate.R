@@ -1,4 +1,4 @@
-setwd("tva")
+#setwd("tva")
 library(haven)
 library(tidyverse)
 
@@ -234,7 +234,21 @@ db11 %>%
 nrow(db12)
 
 ## drop donut and counties with missing latitude/longitude
-# TODO:
-# db12 %>% filter(border_county != 1) %>%
-#     drop_na(latitude, longitud) %>%
-#     filter(pop0 >= 1000 &)
+db12 %>% filter(is.na(border_county)) %>%
+    drop_na(latitude, longitud) %>%
+    filter(pop0 >= 1000 &
+           pop10 >= 1000 &
+           pop20 >= 1000 &
+           pop30 >= 1000 &
+           pop40 >= 1000 &
+           pop50 >= 1000 &
+           pop60 >= 1000 &
+           pop70 >= 1000 &
+           pop80 >= 1000 &
+           pop90 >= 1000 &
+           pop2000 >= 1000) -> build
+nrow(build)
+# 2510 rows, WARNING: Stata get 2763 rows, because NAs are preserved.
+# Here NAs are deleted here.
+
+saveRDS(build, file="build.rds")
