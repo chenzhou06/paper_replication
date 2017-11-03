@@ -3,7 +3,7 @@ library(haven)
 # build <- readRDS(". / build.rds") # missing area variable
 build <- read_dta("./original/build.dta")
 
-# New Variables
+# New Variable
 build %>%
     mutate(
         wage0 = pcmwage00 / (cpi0 / 100),
@@ -109,7 +109,8 @@ dfh %>%
 # drop some obs.
 dfhn %>%
     select(-other60) %>%
-    mutate(d = (b1_lnd01_county00 - area) / (b1_lnd01_county00 + area)) %>%
+    mutate(d = (b1_lnd01_county00 - area) / (b1_lnd01_county00 + area) / 2) %>%
     filter(abs(d) <= 0.03) %>%
     mutate(area = (b1_lnd01_county00 + area) / 2) -> dfnv
-
+nrow(dfnv)
+dfnv$area %>% psych::describe()
