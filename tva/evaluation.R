@@ -114,3 +114,24 @@ dfhn %>%
     mutate(area = (b1_lnd01_county00 + area) / 2) -> dfnv
 nrow(dfnv)
 dfnv$area %>% psych::describe()
+
+
+# standardize variable names
+dfnv %>%
+    rename(emp0 = emp00,
+           manuf_jobs_0 = manuf_jobs_00) %>%
+    select(-matches("manuf\\d+")) %>%
+    rename_at(vars(starts_with("manuf_jobs_")),
+             funs(
+                 stringr::str_replace_all(., "_jobs_", "")
+             )) %>%
+    mutate(
+        other0 = emp0 - agr0 - manuf0,
+        other10 = emp10 - agr10 - manuf10,
+        other20 = emp20 - agr20 - manuf20,
+        other30 = emp30 - agr30 - manuf30,
+        other60 = emp60 - agr60 - manuf60,
+        other80 = emp80 - agr80 - manuf80,
+        other90 = emp90 - agr90 - manuf90,
+        other2000 = emp2000 - agr2000 - manuf2000,
+    ) -> dfsd
