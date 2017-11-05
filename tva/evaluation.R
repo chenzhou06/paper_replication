@@ -115,16 +115,21 @@ dfhn %>%
 nrow(dfnv)
 dfnv$area %>% psych::describe()
 
-
 # standardize variable names
 dfnv %>%
     rename(emp0 = emp00,
            manuf_jobs_0 = manuf_jobs_00) %>%
-    select(-matches("manuf\\d+")) %>%
+    select(-matches("manuf\\d+"), -matches("arg\\d+")) %>%
     rename_at(vars(starts_with("manuf_jobs_")),
              funs(
                  stringr::str_replace_all(., "_jobs_", "")
              )) %>%
+    rename_at(
+        vars(starts_with("ag_jobs_")),
+        funs(
+            stringr::str_replace_all(., "_jobs_", "r")
+        )
+    ) %>%
     mutate(
         other0 = emp0 - agr0 - manuf0,
         other10 = emp10 - agr10 - manuf10,
@@ -134,4 +139,37 @@ dfnv %>%
         other80 = emp80 - agr80 - manuf80,
         other90 = emp90 - agr90 - manuf90,
         other2000 = emp2000 - agr2000 - manuf2000,
-    ) -> dfsd
+        ) -> dfsd
+
+## make share
+dfsd %>%
+    mutate(
+        manufshr0 = manuf0 / emp0,
+        manufshr10 = manuf10 / emp10,
+        manufshr20 = manuf20 / emp20,
+        manufshr30 = manuf30 / emp30,
+        manufshr60 = manuf60 / emp60,
+        manufshr80 = manuf80 / emp80,
+        manufshr90 = manuf90 / emp90,
+        manufshr2000 = manuf2000 / emp2000,
+        agr0 = agr0 / emp0,
+        agr10 = agr10 / emp10,
+        agr20 = agr20 / emp20,
+        agr30 = agr30 / emp30,
+        agr60 = agr60 / emp60,
+        agr80 = agr80 / emp80,
+        agr90 = agr90 / emp90,
+        agr2000 = agr2000 / emp2000) -> dfshr
+
+## prepare outcomes
+dfln <- dfshr
+for (var in c("pop", "emp", "house", "wage", "twage", "agr",
+              "manuf", "other", "medhsval", "medrnt", "fb")) {
+    for (yr in c(seq(0, 90, 10))) {
+        tryCatch({
+            dfln[, paste0("ln", var, yr)] <- dfln[, paste0(var, yr)]
+        }, error=function(e) {print(e)} )
+    }
+}
+
+dfln %>% select(-lntwage20, -lnmedhsval20, -lnmedrnt20) # ERROR: lntwage20 missing! Replication failed.
